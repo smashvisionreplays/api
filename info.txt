@@ -1,0 +1,1 @@
+Launch this server to make queries for example to the db, this will work as an api for development

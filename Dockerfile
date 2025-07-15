@@ -1,0 +1,30 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+ENV PORT=5000
+ENV DB_HOST=database-prueba.cpmi8kiuw7c4.us-east-2.rds.amazonaws.com
+ENV DB_USER=admin
+ENV DB_PASSWORD=Bruno1226*
+ENV DB_NAME=DB_Prueba
+
+ENV CLOUDFLARE_API_KEY=Fp7ymmDMAw7xAGA-FfNtZ6gucij_BtKbrto5Zi8x
+ENV CLOUDFLARE_ACCOUNT_ID=a1620656952ab15e6b1f3ea570729ce2
+ENV CLERK_PUBLISHABLE_KEY=pk_test_ZXZvbHZpbmctZG9lLTQ1LmNsZXJrLmFjY291bnRzLmRldiQ
+ENV CLERK_SECRET_KEY=sk_test_yduQWhs5Lwo1bVhwcH5HV2hmuf5HReW9p6SLofjr5E
+
+ENV YOUTUBE_CLIENT_ID = 297514034642-6767i69dagno4k3u0m4a7pndvblrfkgp.apps.googleusercontent.com
+ENV YOUTUBE_CLIENT_SECRET = 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
+ENV YOUTUBE_API_KEY = AIzaSyBwOnEdI9Qv0dYn5uezGHMGCrMgQTvYMlA
+ENV YOUTUBE_CHANNEL_EMAIL = smashvisionapp@gmail.com
+ENV YOUTUBE_REFRESH_TOKEN=1//05NjeYCY1BQxaCgYIARAAGAUSNwF-L9IriE9y491nzmxXSAZxYgsWzR3-vjOAA5JQ8vscDcfwUdl7TzsnsGVpuxeucYkqiA99cW8
+
+COPY package*.json ./
+
+RUN npm ci --only=production
+
+COPY . .
+
+EXPOSE 5000
+
+CMD ["node", "server.js"]

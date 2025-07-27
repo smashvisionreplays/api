@@ -1,74 +1,74 @@
 import { google } from 'googleapis';
+import { clerkClient } from '@clerk/express';
 
 const YOUTUBE_CLIENT_ID = process.env.YOUTUBE_CLIENT_ID?.trim();
 const YOUTUBE_CLIENT_SECRET = process.env.YOUTUBE_CLIENT_SECRET?.trim();
-const YOUTUBE_REFRESH_TOKEN = process.env.YOUTUBE_REFRESH_TOKEN?.trim();
 
-const oauth2Client = new google.auth.OAuth2(
-  YOUTUBE_CLIENT_ID,
-  YOUTUBE_CLIENT_SECRET,
-  'http://localhost:5000/api/youtube/callback'
-);
+const createOAuth2Client = (userId = null) => {
+  const oauth2Client = new google.auth.OAuth2(
+    YOUTUBE_CLIENT_ID,
+    YOUTUBE_CLIENT_SECRET,
+    'http://localhost:5000/api/youtube/callback'
+  );
+  
+  return oauth2Client;
+};
 
-console.log('YouTube OAuth2 Client initialized with:');
-console.log(`Client ID: ${YOUTUBE_CLIENT_ID ? '✔️' : '❌'}`);
-console.log(`Client Secret: ${YOUTUBE_CLIENT_SECRET ? '✔️' : '❌'}`);
-console.log(`oauth2Client: ${JSON.stringify(oauth2Client)}`);
-if (YOUTUBE_REFRESH_TOKEN) {
-  oauth2Client.setCredentials({
-    refresh_token: YOUTUBE_REFRESH_TOKEN
-  });
-}
-
-export const generateAuthUrl = () => {
+export const generateAuthUrl = (userId) => {
+  const oauth2Client = createOAuth2Client();
   return oauth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: ['https://www.googleapis.com/auth/youtube'],
-    prompt: 'consent'
+    prompt: 'consent',
+    state: userId // Pass userId in state to retrieve it in callback
   });
 };
 
-export const setTokenFromCode = async (code) => {
+export const setTokenFromCode = async (code, userId) => {
+  const oauth2Client = createOAuth2Client();
   const { tokens } = await oauth2Client.getToken(code);
-  oauth2Client.setCredentials(tokens);
   
-  if (tokens.refresh_token) {
-    await saveRefreshTokenToEnv(tokens.refresh_token);
+  if (tokens.refresh_token && userId) {
+    await saveRefreshTokenToClerk(userId, tokens.refresh_token);
   }
   
   return tokens.refresh_token;
 };
 
-const saveRefreshTokenToEnv = async (refreshToken) => {
+const saveRefreshTokenToClerk = async (userId, refreshToken) => {
   try {
-    const fs = await import('fs');
-    const path = await import('path');
-    const { fileURLToPath } = await import('url');
-    
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const envPath = path.join(__dirname, '../../.env');
-    
-    let envContent = fs.readFileSync(envPath, 'utf8');
-    
-    if (envContent.includes('YOUTUBE_REFRESH_TOKEN=')) {
-      envContent = envContent.replace(
-        /YOUTUBE_REFRESH_TOKEN=.*/,
-        `YOUTUBE_REFRESH_TOKEN=${refreshToken}`
-      );
-    } else {
-      envContent += `\nYOUTUBE_REFRESH_TOKEN=${refreshToken}`;
-    }
-    
-    fs.writeFileSync(envPath, envContent);
-    console.log('✅ Refresh token saved to .env file');
+    await clerkClient.users.updateUserMetadata(userId, {
+      privateMetadata: {
+        youtubeRefreshToken: refreshToken
+      }
+    });
+    console.log('✅ Refresh token saved to Clerk user metadata');
   } catch (error) {
-    console.error('❌ Error saving refresh token:', error);
+    console.error('❌ Error saving refresh token to Clerk:', error);
+    throw error;
   }
 };
 
-const getAccessToken = async () => {
+const getRefreshTokenFromClerk = async (userId) => {
   try {
+    const user = await clerkClient.users.getUser(userId);
+    return user.privateMetadata?.youtubeRefreshToken;
+  } catch (error) {
+    console.error('❌ Error getting refresh token from Clerk:', error);
+    return null;
+  }
+};
+
+const getAccessToken = async (userId) => {
+  try {
+    const refreshToken = await getRefreshTokenFromClerk(userId);
+    if (!refreshToken) {
+      throw new Error('No YouTube refresh token found for user');
+    }
+    
+    const oauth2Client = createOAuth2Client();
+    oauth2Client.setCredentials({ refresh_token: refreshToken });
+    
     const { token } = await oauth2Client.getAccessToken();
     return token;
   } catch (error) {
@@ -77,18 +77,19 @@ const getAccessToken = async () => {
   }
 };
 
-const createLiveBroadcast = async (title, description) => {
+const createLiveBroadcast = async (title, description, userId) => {
   try {
-    if (!YOUTUBE_REFRESH_TOKEN) {
+    const refreshToken = await getRefreshTokenFromClerk(userId);
+    if (!refreshToken) {
       return {
         success: false,
-        error: 'YouTube not configured. Need refresh token.',
-        authUrl: generateAuthUrl(),
+        error: 'YouTube not configured. Need to authenticate.',
+        authUrl: generateAuthUrl(userId),
         needsAuth: true
       };
     }
 
-    const accessToken = await getAccessToken();
+    const accessToken = await getAccessToken(userId);
     
     // Create broadcast
     const broadcastResponse = await fetch('https://www.googleapis.com/youtube/v3/liveBroadcasts?part=snippet,status,contentDetails', {
@@ -181,9 +182,9 @@ const createLiveBroadcast = async (title, description) => {
   }
 };
 
-const stopLiveBroadcast = async (broadcastId) => {
+const stopLiveBroadcast = async (broadcastId, userId) => {
   try {
-    const accessToken = await getAccessToken();
+    const accessToken = await getAccessToken(userId);
     
     const response = await fetch(`https://www.googleapis.com/youtube/v3/liveBroadcasts/transition?part=status&id=${broadcastId}&broadcastStatus=complete`, {
       method: 'POST',

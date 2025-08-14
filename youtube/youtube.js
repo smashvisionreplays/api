@@ -110,7 +110,8 @@ const createLiveBroadcast = async (title, description, userId) => {
         },
         contentDetails: {
           enableAutoStart: true,
-          enableAutoStop: true
+          enableAutoStop: true,
+          enableEmbed: true
         }
       })
     });

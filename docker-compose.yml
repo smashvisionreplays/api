@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: tomasossac/api:${API_VERSION:-latest}
+    container_name: api
+    networks:
+      - api
+    env_file:
+      - .env
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+
+  cloudflare-tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare-tunnel
+    networks:
+      - api
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    restart: unless-stopped
+    depends_on:
+      - api
+
+networks:
+  api:
+    driver: bridge

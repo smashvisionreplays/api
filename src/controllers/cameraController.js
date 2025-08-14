@@ -13,6 +13,15 @@ export const startLiveStream = async (req, res) => {
       clubId:clubId,
       watchUrl:watchUrl
     };
+    //FOR NEW CAMERA REOLINK
+    // const bodyPayload = {
+    //   rtspUrl: `rtsp://admin:3L3m3nt!@${cameraIp}`,
+    //   youtubeUrl: `rtmp://a.rtmp.youtube.com/live2/${rtmpKey}`,
+    //   courtNumber: court,
+    //   cameraId:cameraId,
+    //   clubId:clubId,
+    //   watchUrl:watchUrl
+    // };
     console.log("gonna start stream", bodyPayload);
 
     const response = await fetch(streamUrl, {

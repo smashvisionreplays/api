@@ -50,6 +50,16 @@ export const getClipsByClub = async (req, res) => {
   }
 };
 
+export const getClipsByMember = async (req, res) => {
+  try {
+    const clips = await dbClips.selectClips(false, req.params.id);
+    res.json(clips);
+  } catch (error) {
+    console.error("Error fetching clips:", error);
+    res.status(500).json({ error: "Failed to fetch clips" });
+  }
+};
+
 export const getClipDownloadInfoDB = async (req, res) => {
     try {
       const download = await dbClips.selectDownloadURL(req.params.id);

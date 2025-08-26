@@ -22,7 +22,6 @@ export const startLiveStream = async (req, res) => {
     //   clubId:clubId,
     //   watchUrl:watchUrl
     // };
-    console.log("gonna start stream", bodyPayload);
 
     const response = await fetch(streamUrl, {
       method: "POST",
@@ -30,6 +29,15 @@ export const startLiveStream = async (req, res) => {
       body: JSON.stringify(bodyPayload),
     });
 
+    /*This initial response from the club-server if 202 will have this format:
+       res.status(202).json({
+         message: `Connecting stream for camera ${cameraIP}...`,
+         liveStatus: "Connecting",
+         cameraId:cameraId,
+         clubId: clubId,
+         courtNumber: courtNumber,
+       });
+    */
     if (!response.ok) throw new Error(`Failed request to ${streamUrl}`);
 
     const responseData = await response.json();

@@ -11,3 +11,10 @@ export const updateLiveStatus = async (camera_id, club_id, status, notes, url=nu
     const params = [status, url, notes, containerId, club_id, camera_id]
     return await query(sql, params);
 };
+
+// Update camera live status for webhook
+export const updateCameraLiveStatus = async (cameraId, status, url, notes) => {
+    const sql = 'UPDATE Cameras SET liveStatus = ?, liveUrl = ?, liveNotes = ? WHERE ID = ?';
+    const params = [status, url, notes, cameraId];
+    return await query(sql, params);
+};

@@ -17,6 +17,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const API_URL=process.env.API_URL?.trim();
 
 // Middleware
 app.use(cors());
@@ -38,5 +39,5 @@ WebSocketManager.initialize(server);
 
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`WebSocket server available at ws://localhost:${PORT}/ws`);
+  console.log(`WebSocket server available at ws://${API_URL}:${PORT}/ws`);
 });

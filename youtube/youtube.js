@@ -3,12 +3,13 @@ import { clerkClient } from '@clerk/express';
 
 const YOUTUBE_CLIENT_ID = process.env.YOUTUBE_CLIENT_ID?.trim();
 const YOUTUBE_CLIENT_SECRET = process.env.YOUTUBE_CLIENT_SECRET?.trim();
+const API_URL=process.env.API_URL?.trim();
 
 const createOAuth2Client = (userId = null) => {
   const oauth2Client = new google.auth.OAuth2(
     YOUTUBE_CLIENT_ID,
     YOUTUBE_CLIENT_SECRET,
-    'http://localhost:5000/api/youtube/callback'
+    `${API_URL}/api/youtube/callback`
   );
   
   return oauth2Client;

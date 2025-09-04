@@ -21,17 +21,20 @@ const API_URL=process.env.API_URL?.trim();
 
 // Middleware
 app.use(cors());
+
+// Webhook routes (must be before express.json() and clerkMiddleware for raw body parsing)
+app.use("/webhooks", webhookRoutes);
+
 app.use(express.json());
 app.use(clerkMiddleware());
 
-// Routes
+// Protected routes
 app.use("/api/clubs", clubRoutes);
 app.use("/api/videos", videoRoutes);
 app.use("/api/cameras", cameraRoutes);
 app.use("/api/clips", clipRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/youtube", youtubeRoutes);
-app.use("/webhooks", webhookRoutes);
 
 // Create HTTP server and initialize WebSocket
 const server = createServer(app);

@@ -25,3 +25,26 @@ export const updateUserClips = async (generatedClips, email) => {
 export const selectContactID = async (email, password) => {
     return await query('SELECT ContactID FROM Users WHERE Email = ? AND Password = ?', [email, password]);
 };
+
+// Insert user from Clerk webhook
+export const insertClerkUser = async (clerkId, email, firstName, lastName) => {
+    const name = `${firstName || ''} ${lastName || ''}`.trim() || email;
+    return await query('INSERT INTO Users (ClerkID, Name, Email, generatedClips) VALUES (?, ?, ?, 0)', [clerkId, name, email]);
+};
+
+// Update user from Clerk webhook
+export const updateClerkUser = async (clerkId, email, firstName, lastName) => {
+    const name = `${firstName || ''} ${lastName || ''}`.trim() || email;
+    return await query('UPDATE Users SET Name = ?, Email = ? WHERE ClerkID = ?', [name, email, clerkId]);
+};
+
+// Delete user from Clerk webhook
+export const deleteClerkUser = async (clerkId) => {
+    return await query('DELETE FROM Users WHERE ClerkID = ?', [clerkId]);
+};
+
+// Check if user exists by Clerk ID
+export const getUserByClerkId = async (clerkId) => {
+    const results = await query('SELECT * FROM Users WHERE ClerkID = ?', [clerkId]);
+    return results.length > 0 ? results[0] : null;
+};

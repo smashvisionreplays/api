@@ -6,6 +6,32 @@ import { insertClerkUser, updateClerkUser, deleteClerkUser, getUserByClerkId } f
 
 const router = express.Router();
 
+// Function to update Clerk user metadata
+const updateClerkUserMetadata = async (clerkId, publicMetadata, privateMetadata) => {
+  try {
+    const response = await fetch(`https://api.clerk.com/v1/users/${clerkId}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${process.env.CLERK_SECRET_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        public_metadata: publicMetadata,
+        private_metadata: privateMetadata
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to update user metadata: ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating Clerk user metadata:', error);
+    throw error;
+  }
+};
+
 // Test endpoint to verify webhook route is accessible
 router.get('/test', (req, res) => {
   console.log('Webhook test endpoint hit');
@@ -63,8 +89,19 @@ router.post('/clerk', async (req, res) => {
           const primaryEmail = email_addresses.find(email => email.id === data.primary_email_address_id);
           
           if (primaryEmail) {
-            await insertClerkUser(clerkId, primaryEmail.email_address, first_name, last_name);
+            const result = await insertClerkUser(clerkId, primaryEmail.email_address, first_name, last_name);
             console.log(`User created in database: ${clerkId} - ${primaryEmail.email_address}`);
+            
+            // Get the database ID from the insert result
+            const dbUserId = result.insertId;
+            
+            // Update Clerk user metadata
+            await updateClerkUserMetadata(
+              clerkId,
+              { role: 'member' },
+              { id: dbUserId.toString() }
+            );
+            console.log(`Updated Clerk user metadata for ${clerkId} with DB ID: ${dbUserId}`);
           }
         } catch (error) {
           console.error('Error creating user:', error);

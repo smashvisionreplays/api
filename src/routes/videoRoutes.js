@@ -1,6 +1,5 @@
 import express from "express";
 import { getVideoById, getVideosByParams, getVideoBestPoints, getVideosByClub, blockVideo, unblockVideo } from "../controllers/videoController.js";
-import { message } from "antd";
 
 const router = express.Router();
 

@@ -1,5 +1,6 @@
 import express from "express";
 import { getVideoById, getVideosByParams, getVideoBestPoints, getVideosByClub, blockVideo, unblockVideo } from "../controllers/videoController.js";
+import { message } from "antd";
 
 const router = express.Router();
 
@@ -36,7 +37,7 @@ router.get("/stream/:videoId", async (req, res) => {
     }
   } catch (error) {
     console.error('Error fetching Cloudflare video:', error);
-    res.status(500).json({ error: 'Failed to fetch video details' });
+    res.status(500).json({ error: 'Failed to fetch video details', message:error });
   }
 });
 

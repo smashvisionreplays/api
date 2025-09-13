@@ -6,7 +6,7 @@ export const getAllClubs = async (req, res) => {
     res.json(clubs);
   } catch (error) {
     console.error("Error fetching clubs:", error);
-    res.status(500).json({ error: "Failed to fetch clubs" });
+    res.status(500).json({ error: "Failed to fetch clubs", message: error });
   }
 };
 
@@ -16,6 +16,6 @@ export const getClubById = async (req, res) => {
     res.json(club);
   } catch (error) {
     console.error("Error fetching club:", error);
-    res.status(500).json({ error: "Failed to fetch club" });
+    res.status(500).json({ error: "Failed to fetch club", message: error });
   }
 };

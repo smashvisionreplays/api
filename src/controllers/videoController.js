@@ -7,7 +7,7 @@ export const getVideoById = async (req, res) => {
     res.json(videoData);
   } catch (error) {
     console.error("Error fetching video:", error);
-    res.status(500).json({ error: "Failed to fetch video" });
+    res.status(500).json({ error: "Failed to fetch video", message: error });
   }
 };
 
@@ -18,7 +18,7 @@ export const getVideosByParams = async (req, res) => {
     res.json(videos);
   } catch (error) {
     console.error("Error fetching videos:", error);
-    res.status(500).json({ error: "Failed to fetch videos" });
+    res.status(500).json({ error: "Failed to fetch videos", message: error });
   }
 };
 
@@ -28,7 +28,7 @@ export const getVideosByClub = async (req, res) => {
     res.json(videos);
   } catch (error) {
     console.error("Error fetching club videos:", error);
-    res.status(500).json({ error: "Failed to fetch club videos" });
+    res.status(500).json({ error: "Failed to fetch club videos", message: error });
   }
 };
 
@@ -40,7 +40,7 @@ export const getVideoBestPoints = async (req, res) => {
         res.json(bestPoints);
     } catch (error) {
         console.error("Error fetching best points:", error);
-        res.status(500).json({ error: "Failed to fetch best points" });
+        res.status(500).json({ error: "Failed to fetch best points", message: error });
     }
     }
 
@@ -50,7 +50,7 @@ export const blockVideo = async (req, res) => {
     res.json({ message: "Video blocked" });
   } catch (error) {
     console.error("Error blocking video:", error);
-    res.status(500).json({ error: "Failed to block video" });
+    res.status(500).json({ error: "Failed to block video", message: error });
   }
 };
 
@@ -60,6 +60,6 @@ export const unblockVideo = async (req, res) => {
     res.json({ message: "Video unblocked" });
   } catch (error) {
     console.error("Error unblocking video:", error);
-    res.status(500).json({ error: "Failed to unblock video" });
+    res.status(500).json({ error: "Failed to unblock video", message: error });
   }
 }

@@ -46,7 +46,7 @@ export const getClipsByClub = async (req, res) => {
     res.json(clips);
   } catch (error) {
     console.error("Error fetching clips:", error);
-    res.status(500).json({ error: "Failed to fetch clips" });
+    res.status(500).json({ error: "Failed to fetch clips", message: error});
   }
 };
 
@@ -56,7 +56,7 @@ export const getClipsByMember = async (req, res) => {
     res.json(clips);
   } catch (error) {
     console.error("Error fetching clips:", error);
-    res.status(500).json({ error: "Failed to fetch clips" });
+    res.status(500).json({ error: "Failed to fetch clips", message: error});
   }
 };
 
@@ -66,7 +66,7 @@ export const getClipDownloadInfoDB = async (req, res) => {
       res.json(download);
     } catch (error) {
       console.error("Error fetching download url:", error);
-      res.status(500).json({ error: "Failed to fetch download url" });
+      res.status(500).json({ error: "Failed to fetch download url", message: error});
     }
   };
   
@@ -77,7 +77,7 @@ export const updateClipDownloadDB = async (req, res) => {
       res.json(download);
     } catch (error) {
       console.error("Error updating download:", error);
-      res.status(500).json({ error: "Failed to update download" });
+      res.status(500).json({ error: "Failed to update download", message: error});
     }
 };
 
@@ -87,7 +87,7 @@ export const createClipDownload = async (req, res) => {
       res.json(download);
     } catch (error) {
       console.error("Error creating clip download:", error);
-      res.status(500).json({ error: "Failed to create download url" });
+      res.status(500).json({ error: "Failed to create download url", message: error});
     }
 };
 
@@ -97,6 +97,6 @@ export const getClipDownloadInfoCloudflare = async (req, res) => {
       res.json(download);
     } catch (error) {
       console.error("Error fetching download url:", error);
-      res.status(500).json({ error: "Failed to fetch download url" });
+      res.status(500).json({ error: "Failed to fetch download url", message: error});
     }
 };

@@ -47,7 +47,7 @@ export const startLiveStream = async (req, res) => {
     res.json({ message: "Live stream started", data: responseData });
   } catch (error) {
     console.error("Error starting live stream:", error);
-    res.status(500).json({ error: "Failed to start live stream" });
+    res.status(500).json({ error: "Failed to start live stream", message: error });
   }
 };
 
@@ -71,7 +71,7 @@ export const stopLiveStream = async (req, res) => {
     res.json({ message: "Live stream stopped", data: responseData });
   } catch (error) {
     console.error("Error stopping live stream:", error);
-    res.status(500).json({ error: "Failed to stop live stream" });
+    res.status(500).json({ error: "Failed to stop live stream", message: error });
   }
 };
 
@@ -81,6 +81,6 @@ export const getCamerasByClub = async (req, res) => {
     res.json(cameras);
   } catch (error) {
     console.error("Error fetching cameras:", error);
-    res.status(500).json({ error: "Failed to fetch cameras" });
+    res.status(500).json({ error: "Failed to fetch cameras", message: error });
   }
 };

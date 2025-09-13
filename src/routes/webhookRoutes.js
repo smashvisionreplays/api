@@ -169,7 +169,7 @@ router.post('/live-status', async (req, res) => {
     res.json({ success: true, message: 'Status updated and broadcasted' });
   } catch (error) {
     console.error('Webhook error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', message: error });
   }
 });
 

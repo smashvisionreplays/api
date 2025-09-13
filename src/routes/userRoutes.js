@@ -21,7 +21,7 @@ router.get("/metadata/:userId", async (req, res) => {
     res.json(userData);
   } catch (error) {
     console.error("Error fetching user metadata:", error.message);
-    res.status(500).json({ error: "Failed to fetch user metadata", details: error.message });
+    res.status(500).json({ error: "Failed to fetch user metadata", message: error.message });
   }
 });
 

@@ -38,7 +38,14 @@ export const startLiveStream = async (req, res) => {
          courtNumber: courtNumber,
        });
     */
-    if (!response.ok) throw new Error(`Failed request to ${streamUrl}`);
+    if (!response.ok) {
+      const errorMessage = "Club server is not available. Please ensure the club server Docker container is running.";
+      return res.status(503).json({ 
+        error: "Club server unavailable", 
+        message: errorMessage,
+        isClubServerDown: true 
+      });
+    }
 
     const responseData = await response.json();
     console.log("gonna update db watchurl is", watchUrl);
@@ -47,7 +54,14 @@ export const startLiveStream = async (req, res) => {
     res.json({ message: "Live stream started", data: responseData });
   } catch (error) {
     console.error("Error starting live stream:", error);
-    res.status(500).json({ error: "Failed to start live stream", message: error });
+    const errorMessage = error.message.includes("Failed request to") 
+      ? "Club server is not available. Please ensure the club server Docker container is running."
+      : "Failed to start live stream";
+    res.status(500).json({ 
+      error: "Failed to start live stream", 
+      message: errorMessage,
+      isClubServerDown: error.message.includes("Failed request to")
+    });
   }
 };
 
@@ -63,7 +77,14 @@ export const stopLiveStream = async (req, res) => {
 
     console.log("response from stop from club server is : ",response)
 
-    if (!response.ok) throw new Error(`Failed request to ${streamUrl}`);
+    if (!response.ok) {
+      const errorMessage = "Club server is not available. Please ensure the club server Docker container is running.";
+      return res.status(503).json({ 
+        error: "Club server unavailable", 
+        message: errorMessage,
+        isClubServerDown: true 
+      });
+    }
 
     const responseData = await response.json();
     await db.updateLiveStatus(cameraId, clubId, "Off", "Stream stopped", null, null);
@@ -71,7 +92,14 @@ export const stopLiveStream = async (req, res) => {
     res.json({ message: "Live stream stopped", data: responseData });
   } catch (error) {
     console.error("Error stopping live stream:", error);
-    res.status(500).json({ error: "Failed to stop live stream", message: error });
+    const errorMessage = error.message.includes("Failed request to") 
+      ? "Club server is not available. Please ensure the club server Docker container is running."
+      : "Failed to stop live stream";
+    res.status(500).json({ 
+      error: "Failed to stop live stream", 
+      message: errorMessage,
+      isClubServerDown: error.message.includes("Failed request to")
+    });
   }
 };
 

@@ -10,6 +10,7 @@ import clipRoutes from "./src/routes/clipRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import youtubeRoutes from "./src/routes/youtubeRoutes.js";
 import webhookRoutes from "./src/routes/webhookRoutes.js";
+import statisticsRoutes from "./src/routes/statisticsRoutes.js";
 import WebSocketManager from "./src/websocket/WebSocketManager.js";
 
 // Load environment variables
@@ -35,6 +36,7 @@ app.use("/api/cameras", cameraRoutes);
 app.use("/api/clips", clipRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/youtube", youtubeRoutes);
+app.use("/api", statisticsRoutes);
 
 // Create HTTP server and initialize WebSocket
 const server = createServer(app);
